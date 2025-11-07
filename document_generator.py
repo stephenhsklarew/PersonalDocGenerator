@@ -84,14 +84,15 @@ class DocumentGenerator:
         print("\n" + "="*60)
         print("WRITING STYLE & VOICE")
         print("="*60)
-        print("Enter the writing style/voice information.")
-        print("Options:")
-        print("  1. Enter a file path (local)")
-        print("  2. Enter a Google Drive link")
-        print("  3. Type/paste the style description directly")
+        print("You can provide the writing style in three ways:")
+        print("  • File path: examples/sample_writing_style.txt")
+        print("  • Google Drive link: https://docs.google.com/document/d/...")
+        print("  • Direct text: Type your style description here")
+        print()
+        print("Press Enter to use default professional style.")
         print()
 
-        choice = input("Your choice (path/link/text): ").strip()
+        choice = input("Enter file path, link, or text: ").strip()
 
         if not choice:
             print("No input provided. Using default professional style.")
@@ -114,14 +115,15 @@ class DocumentGenerator:
         print("\n" + "="*60)
         print("TOPIC, INSIGHTS & QUOTES")
         print("="*60)
-        print("Enter the topic information (insights, quotes, key points).")
-        print("Options:")
-        print("  1. Enter a file path (local)")
-        print("  2. Enter a Google Drive link")
-        print("  3. Type/paste the topic information directly")
+        print("Provide your topic content (insights, quotes, key points):")
+        print("  • File path: examples/sample_topic.txt")
+        print("  • Google Drive link: https://docs.google.com/document/d/...")
+        print("  • Direct text: Type your topic description here")
+        print()
+        print("This field is required.")
         print()
 
-        choice = input("Your choice (path/link/text): ").strip()
+        choice = input("Enter file path, link, or text: ").strip()
 
         if not choice:
             print("Error: Topic information is required.")
@@ -193,13 +195,12 @@ class DocumentGenerator:
         print("OUTPUT LOCATION")
         print("="*60)
         print("Where should the document be saved?")
-        print("Options:")
-        print("  1. Enter a local directory path (e.g., ~/Documents/)")
-        print("  2. Enter a Google Drive folder link")
-        print("  3. Press Enter for current directory")
+        print("  • Directory path: ~/Documents/output")
+        print("  • Google Drive link: https://drive.google.com/drive/folders/...")
+        print("  • Press Enter for current directory")
         print()
 
-        location = input("Output location: ").strip()
+        location = input("Enter directory path or press Enter: ").strip()
         if not location:
             location = "."
             print(f"Using current directory: {os.path.abspath(location)}")
