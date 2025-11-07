@@ -304,8 +304,9 @@ class DocumentGenerator:
         print("OUTPUT LOCATION")
         print("="*60)
         print("Where should the document be saved?")
-        print("  • Directory path: ~/Documents/output")
-        print("  • Google Drive link: https://drive.google.com/drive/folders/...")
+        print("  • Directory path: ~/Documents/output (saves as markdown .md file)")
+        print("  • Google Drive link: https://drive.google.com/drive/folders/... (creates native Google Doc)")
+        print("  • Type 'docs' to create in Google Docs root")
         print("  • Press Enter for current directory")
         print()
 
@@ -313,14 +314,41 @@ class DocumentGenerator:
         if not location:
             location = "."
             print(f"Using current directory: {os.path.abspath(location)}")
+        elif location.lower() == 'docs':
+            location = "docs.google.com"
+            print("Will create as Google Doc")
 
         return location
 
-    def generate_document(self) -> str:
-        """Generate the document using selected AI model."""
+    def generate_document(self, use_markdown: bool = True) -> str:
+        """Generate the document using selected AI model.
+
+        Args:
+            use_markdown: If True, format with markdown. If False, use plain text formatting for Google Docs.
+        """
         print("\n" + "="*60)
         print("GENERATING DOCUMENT...")
         print("="*60)
+
+        # Determine formatting instructions
+        if use_markdown:
+            format_instructions = """
+FORMAT: Use Markdown formatting:
+- Use # for headings (# H1, ## H2, ### H3)
+- Use **bold** for emphasis
+- Use *italic* for subtle emphasis
+- Use bullet points with - or *
+- Use numbered lists with 1., 2., 3.
+"""
+        else:
+            format_instructions = """
+FORMAT: Use plain text formatting suitable for Google Docs:
+- Write section headings in Title Case on their own line
+- Use ALL CAPS sparingly for emphasis
+- Use line breaks to separate sections
+- Do NOT use markdown syntax (no #, **, *, etc.)
+- Write naturally as you would in a word processor
+"""
 
         # Build the prompt
         prompt = f"""You are a professional content writer tasked with creating a {self.output_type}.
@@ -349,6 +377,8 @@ DOCUMENT REQUIREMENTS:
 - Type: {self.output_type}
 - Length: {self.size}
 - Audience: {self.audience}
+
+{format_instructions}
 
 ANTI-AI-PATTERN INSTRUCTIONS (CRITICAL):
 Write like a human, not an AI. Specifically avoid these common AI patterns:
@@ -501,8 +531,11 @@ Generate the complete document now:"""
         print(f"Topic Length: {len(self.topic_content)} characters")
         print(f"Output Location: {self.output_location}")
 
+        # Determine if output is Google Drive/Docs
+        is_google_output = "drive.google.com" in self.output_location or "docs.google.com" in self.output_location
+
         # Generate and save
-        content = self.generate_document()
+        content = self.generate_document(use_markdown=not is_google_output)
         self.save_document(content)
 
         print("\n" + "="*60)
@@ -555,8 +588,11 @@ Generate the complete document now:"""
             print("Cancelled.")
             sys.exit(0)
 
+        # Determine if output is Google Drive/Docs
+        is_google_output = "drive.google.com" in self.output_location or "docs.google.com" in self.output_location
+
         # Generate and save
-        content = self.generate_document()
+        content = self.generate_document(use_markdown=not is_google_output)
         self.save_document(content)
 
         print("\n" + "="*60)
