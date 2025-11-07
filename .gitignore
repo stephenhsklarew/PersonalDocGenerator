@@ -45,3 +45,4 @@ generated_*.pdf
 # Google credentials
 credentials.json
 token.json
+token.pickle

@@ -434,25 +434,22 @@ Generate the complete document now:"""
             if self.google_drive:
                 output_type_clean = self.output_type.replace(" ", "_").lower()
                 title = f"Generated {self.output_type.title()}"
-                filename = f"generated_{output_type_clean}.md"
 
-                # Check if it's a folder URL (for uploading files) or docs URL (for creating Google Docs)
-                if "docs.google.com" in self.output_location or "/folders/" not in self.output_location:
-                    # Create as Google Doc
-                    url = self.google_drive.create_doc(title, content)
-                    if url:
+                # Extract folder ID if it's a folder URL
+                folder_id = None
+                if "/folders/" in self.output_location:
+                    folder_id = self.google_drive.extract_file_id(self.output_location)
+
+                # Always create as native Google Doc
+                url = self.google_drive.create_doc(title, content, folder_id=folder_id)
+                if url:
+                    if folder_id:
+                        print(f"✓ Document saved as Google Doc in folder!")
+                    else:
                         print(f"✓ Document saved as Google Doc!")
-                        print(f"  URL: {url}")
-                        print(f"  Size: {len(content)} characters")
-                        return
-                else:
-                    # Upload to Drive folder
-                    url = self.google_drive.upload_to_folder(self.output_location, filename, content)
-                    if url:
-                        print(f"✓ Document uploaded to Google Drive!")
-                        print(f"  URL: {url}")
-                        print(f"  Size: {len(content)} characters")
-                        return
+                    print(f"  URL: {url}")
+                    print(f"  Size: {len(content)} characters")
+                    return
 
                 # If Google Drive save failed, fall back to local
                 print("⚠ Google Drive save failed, saving locally instead...")

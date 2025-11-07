@@ -150,8 +150,14 @@ class GoogleDriveHelper:
             print(f"Error: {e}")
             return ""
 
-    def create_doc(self, title: str, content: str) -> Optional[str]:
-        """Create a new Google Doc with content"""
+    def create_doc(self, title: str, content: str, folder_id: Optional[str] = None) -> Optional[str]:
+        """Create a new Google Doc with content
+
+        Args:
+            title: Title of the document
+            content: Content to insert
+            folder_id: Optional folder ID to place the document in
+        """
         try:
             # Create document
             document = self.docs_service.documents().create(
@@ -172,6 +178,24 @@ class GoogleDriveHelper:
                 documentId=doc_id,
                 body={'requests': requests}
             ).execute()
+
+            # If folder_id specified, move the doc to that folder
+            if folder_id:
+                # Get the current parents
+                file = self.drive_service.files().get(
+                    fileId=doc_id,
+                    fields='parents'
+                ).execute()
+
+                previous_parents = ",".join(file.get('parents', []))
+
+                # Move the file to the new folder
+                self.drive_service.files().update(
+                    fileId=doc_id,
+                    addParents=folder_id,
+                    removeParents=previous_parents,
+                    fields='id, parents'
+                ).execute()
 
             url = f"https://docs.google.com/document/d/{doc_id}/edit"
             print(f"✓ Created Google Doc: {url}")
