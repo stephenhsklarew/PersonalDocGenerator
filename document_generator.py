@@ -320,34 +320,26 @@ class DocumentGenerator:
 
         return location
 
-    def generate_document(self, use_markdown: bool = True) -> str:
+    def generate_document(self) -> str:
         """Generate the document using selected AI model.
 
-        Args:
-            use_markdown: If True, format with markdown. If False, use plain text formatting for Google Docs.
+        Always generates in markdown format. For Google Docs output,
+        markdown will be converted to native formatting automatically.
         """
         print("\n" + "="*60)
         print("GENERATING DOCUMENT...")
         print("="*60)
 
-        # Determine formatting instructions
-        if use_markdown:
-            format_instructions = """
+        # Always use markdown - will be converted to Google Docs format if needed
+        format_instructions = """
 FORMAT: Use Markdown formatting:
-- Use # for headings (# H1, ## H2, ### H3)
-- Use **bold** for emphasis
-- Use *italic* for subtle emphasis
+- Use # for the main title (only once at the beginning)
+- Use ## for major section headings
+- Use ### for subsection headings
+- Use **bold** for emphasis (sparingly)
+- Use *italic* for subtle emphasis (sparingly)
 - Use bullet points with - or *
 - Use numbered lists with 1., 2., 3.
-"""
-        else:
-            format_instructions = """
-FORMAT: Use plain text formatting suitable for Google Docs:
-- Write section headings in Title Case on their own line
-- Use ALL CAPS sparingly for emphasis
-- Use line breaks to separate sections
-- Do NOT use markdown syntax (no #, **, *, etc.)
-- Write naturally as you would in a word processor
 """
 
         # Build the prompt
@@ -528,11 +520,8 @@ Generate the complete document now:"""
         print(f"Topic Length: {len(self.topic_content)} characters")
         print(f"Output Location: {self.output_location}")
 
-        # Determine if output is Google Drive/Docs
-        is_google_output = "drive.google.com" in self.output_location or "docs.google.com" in self.output_location
-
-        # Generate and save
-        content = self.generate_document(use_markdown=not is_google_output)
+        # Generate and save (always uses markdown, converted automatically for Google Docs)
+        content = self.generate_document()
         self.save_document(content)
 
         print("\n" + "="*60)
@@ -585,11 +574,8 @@ Generate the complete document now:"""
             print("Cancelled.")
             sys.exit(0)
 
-        # Determine if output is Google Drive/Docs
-        is_google_output = "drive.google.com" in self.output_location or "docs.google.com" in self.output_location
-
-        # Generate and save
-        content = self.generate_document(use_markdown=not is_google_output)
+        # Generate and save (always uses markdown, converted automatically for Google Docs)
+        content = self.generate_document()
         self.save_document(content)
 
         print("\n" + "="*60)
