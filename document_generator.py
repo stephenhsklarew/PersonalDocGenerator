@@ -304,6 +304,17 @@ class DocumentGenerator:
 WRITING STYLE & VOICE:
 {self.style_content}
 
+CRITICAL: Deeply analyze the writing style above. Pay close attention to:
+- Sentence structure patterns and rhythm
+- Word choice and vocabulary level
+- Tone and personality quirks
+- How ideas are introduced and developed
+- Paragraph structure and flow
+- Use of examples, metaphors, or analogies
+- Any unique stylistic signatures
+
+Mirror these patterns authentically in your writing.
+
 TARGET AUDIENCE:
 {self.audience}
 
@@ -315,12 +326,35 @@ DOCUMENT REQUIREMENTS:
 - Length: {self.size}
 - Audience: {self.audience}
 
-Please generate a complete, well-structured {self.output_type} that:
-1. Matches the provided writing style and voice
+ANTI-AI-PATTERN INSTRUCTIONS (CRITICAL):
+Write like a human, not an AI. Specifically avoid these common AI patterns:
+
+❌ AVOID:
+- Generic openings ("In today's world...", "In an era of...", "As we navigate...")
+- Excessive hedging language ("may," "might," "could potentially," "arguably")
+- Formulaic transitions ("Moreover," "Furthermore," "Additionally," "In conclusion")
+- Overly enthusiastic or promotional tone
+- Lists of abstract concepts without concrete examples
+- Perfectly balanced arguments (real writing has a point of view)
+- Explaining what you're about to do ("Let's explore...", "We will examine...")
+- Meta-commentary about the document itself
+
+✓ INSTEAD:
+- Start directly with substance or a specific observation
+- Make clear, confident statements when appropriate
+- Use natural transitions that flow from ideas
+- Vary sentence structure organically (mix short and long)
+- Include specific examples, anecdotes, or concrete details
+- Write with authentic voice and clear perspective
+- Let ideas connect naturally without announcing connections
+
+Generate a complete, well-structured {self.output_type} that:
+1. DEEPLY matches the provided writing style and voice (analyze it carefully first)
 2. Is tailored to the target audience ({self.audience})
-3. Incorporates the topic, insights, and quotes provided
+3. Incorporates the topic, insights, and quotes provided naturally
 4. Meets the length requirement ({self.size})
-5. Is professionally formatted and ready for publication
+5. Sounds like authentic human writing, not AI-generated content
+6. Is professionally formatted and ready for publication
 
 Generate the complete document now:"""
 
