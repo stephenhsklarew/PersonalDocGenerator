@@ -482,6 +482,17 @@ Generate the complete document now:"""
         # Fallback if no title found
         return f"Generated {self.output_type.title()}"
 
+    def _get_model_name_for_filename(self) -> str:
+        """Get a clean model name suitable for filename."""
+        import re
+        # Get base model name and clean it for filename
+        model_name = self.ai_manager.name
+        # Remove parenthetical descriptions like "(Multimodal)" or "(Fast)"
+        model_name = re.sub(r'\s*\([^)]*\)', '', model_name)
+        # Replace spaces with hyphens
+        model_name = model_name.replace(' ', '-')
+        return model_name
+
     def save_document(self, content: str) -> None:
         """Save the generated document to the specified location."""
         print("\n" + "="*60)
@@ -490,12 +501,13 @@ Generate the complete document now:"""
 
         # Extract title from content for filename
         doc_title = self.extract_title_from_content(content)
+        model_name = self._get_model_name_for_filename()
 
         # Check if it's a Google Drive location
         if "drive.google.com" in self.output_location or "docs.google.com" in self.output_location:
             if self.google_drive:
-                # Format: [Title]-Generated
-                title = f"{doc_title}-Generated"
+                # Format: [Title]-[AI Model]-Generated
+                title = f"{doc_title}-{model_name}-Generated"
 
                 # Extract folder ID if it's a folder URL
                 folder_id = None
@@ -528,8 +540,8 @@ Generate the complete document now:"""
         if not output_path.exists():
             output_path.mkdir(parents=True, exist_ok=True)
 
-        # Format: [Title]-Generated.md
-        filename = f"{doc_title}-Generated.md"
+        # Format: [Title]-[AI Model]-Generated.md
+        filename = f"{doc_title}-{model_name}-Generated.md"
         full_path = output_path / filename
 
         # Save the file
