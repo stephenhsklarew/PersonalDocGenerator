@@ -724,7 +724,7 @@ Examples:
     parser.add_argument(
         "-m", "--model",
         default="claude-3-5-sonnet",
-        help="AI model to use (default: claude-3-5-sonnet). Options: claude-3-5-sonnet, claude-3-5-haiku, claude-3-opus, gpt-4, gpt-4o, gpt-3.5-turbo, gemini-pro, gemini-1.5-pro, gemini-1.5-flash"
+        help="AI model to use (default: claude-3-5-sonnet). Options: claude-3-5-sonnet, claude-3-5-haiku, claude-3-opus, gpt-4, gpt-4o, gpt-3.5-turbo, gemini-2.5-flash, gemini-2.5-pro, gemini-1.5-pro, gemini-1.5-flash, gemini-pro"
     )
     parser.add_argument(
         "-t", "--topic",
@@ -758,14 +758,14 @@ Examples:
         "--mode",
         choices=["test", "production"],
         default="test",
-        help="Operation mode: 'test' uses Gemini 1.5 Flash (free), 'production' uses GPT-4o (default: test)"
+        help="Operation mode: 'test' uses Gemini 2.5 Flash (free), 'production' uses GPT-4o (default: test)"
     )
 
     args = parser.parse_args()
 
     # Override model based on mode if not explicitly set
     if args.mode == "test":
-        model_to_use = "gemini-1.5-flash"
+        model_to_use = "gemini-2.5-flash"
     else:  # production
         model_to_use = "gpt-4o"
 

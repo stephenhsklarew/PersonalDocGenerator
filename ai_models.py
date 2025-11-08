@@ -27,8 +27,10 @@ class AIModelManager:
 
         # Google Gemini models
         'gemini-pro': {'provider': 'gemini', 'model': 'gemini-pro', 'name': 'Gemini Pro'},
-        'gemini-1.5-pro': {'provider': 'gemini', 'model': 'gemini-1.5-pro-latest', 'name': 'Gemini 1.5 Pro (Latest)'},
-        'gemini-1.5-flash': {'provider': 'gemini', 'model': 'gemini-1.5-flash-latest', 'name': 'Gemini 1.5 Flash (Fast)'},
+        'gemini-2.5-flash': {'provider': 'gemini', 'model': 'gemini-2.5-flash', 'name': 'Gemini 2.5 Flash (Latest, Fast & Free)'},
+        'gemini-2.5-pro': {'provider': 'gemini', 'model': 'gemini-2.5-pro', 'name': 'Gemini 2.5 Pro (Latest)'},
+        'gemini-1.5-pro': {'provider': 'gemini', 'model': 'gemini-1.5-pro-latest', 'name': 'Gemini 1.5 Pro'},
+        'gemini-1.5-flash': {'provider': 'gemini', 'model': 'gemini-1.5-flash-latest', 'name': 'Gemini 1.5 Flash'},
     }
 
     def __init__(self, model_key: str = 'claude-3-5-sonnet'):
