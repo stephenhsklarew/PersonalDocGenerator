@@ -29,7 +29,7 @@ except ImportError as e:
 class DocumentGenerator:
     """Main class for document generation."""
 
-    def __init__(self, model_key: str = 'claude-3-5-sonnet'):
+    def __init__(self, model_key: str = 'qwen-32b'):
         """Initialize the document generator."""
         self.model_key = model_key
         self.ai_manager = None
@@ -150,10 +150,11 @@ class DocumentGenerator:
         index = 1
         key_to_number = {}
 
-        for provider in ['anthropic', 'openai', 'gemini']:
+        for provider in ['qwen', 'claude', 'openai', 'gemini']:
             if provider in by_provider:
                 provider_name = {
-                    'anthropic': 'Anthropic Claude',
+                    'qwen': 'Qwen (Local, Free)',
+                    'claude': 'Anthropic Claude',
                     'openai': 'OpenAI GPT',
                     'gemini': 'Google Gemini'
                 }[provider]
@@ -165,13 +166,13 @@ class DocumentGenerator:
                     index += 1
                 print()
 
-        print(f"Default: 1 (Claude 3.5 Sonnet)")
+        print(f"Default: 1 (Qwen 2.5 32B - Local, Free)")
         print()
 
         choice = input("Enter number or model key (or press Enter for default): ").strip()
 
         if not choice:
-            return "claude-3-5-sonnet"
+            return "qwen-32b"
 
         # Check if it's a number
         if choice in key_to_number:
@@ -186,8 +187,8 @@ class DocumentGenerator:
 
         # Invalid input
         print(f"\n⚠ Invalid selection: '{choice}'")
-        print("Using default: Claude 3.5 Sonnet")
-        return "claude-3-5-sonnet"
+        print("Using default: Qwen 2.5 32B (Local, Free)")
+        return "qwen-32b"
 
     def get_style_input(self) -> str:
         """Get writing style input from user."""
@@ -690,14 +691,14 @@ Generate the complete document now:"""
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
-        description="AI-powered document generator using multiple AI models (Claude, GPT, Gemini)",
+        description="AI-powered document generator using multiple AI models (Qwen, Claude, GPT, Gemini)",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   Interactive mode (default):
     python3 document_generator.py
 
-  Test mode (default - uses free Gemini 1.5 Flash):
+  Test mode (default - uses local Qwen 2.5 32B - free):
     python3 document_generator.py \\
       --topic "examples/sample_topic.txt" \\
       --style "examples/sample_writing_style.txt" \\
@@ -706,14 +707,14 @@ Examples:
       --size "3 pages" \\
       --output "./output"
 
-  Production mode (uses GPT-4o):
+  Production mode (also uses Qwen 2.5 32B - local, free):
     python3 document_generator.py \\
       --mode production \\
       --topic "Write about AI in healthcare" \\
       --audience "healthcare executives" \\
       --type "blog post"
 
-  Override mode with specific model:
+  Override with specific model:
     python3 document_generator.py \\
       --model claude-3-5-sonnet \\
       --topic "Remote work trends" \\
@@ -723,8 +724,8 @@ Examples:
 
     parser.add_argument(
         "-m", "--model",
-        default="claude-3-5-sonnet",
-        help="AI model to use (default: claude-3-5-sonnet). Options: claude-3-5-sonnet, claude-3-5-haiku, claude-3-opus, gpt-4, gpt-4o, gpt-3.5-turbo, gemini-2.5-flash, gemini-2.5-pro, gemini-1.5-pro, gemini-1.5-flash, gemini-pro"
+        default="qwen-32b",
+        help="AI model to use (default: qwen-32b). Options: qwen-32b, qwen-72b, qwen-14b, qwen-7b, claude-3-5-sonnet, claude-3-5-haiku, claude-3-opus, gpt-4, gpt-4o, gpt-3.5-turbo, gemini-2.5-flash, gemini-2.5-pro, gemini-1.5-pro, gemini-1.5-flash, gemini-pro"
     )
     parser.add_argument(
         "-t", "--topic",
@@ -758,19 +759,19 @@ Examples:
         "--mode",
         choices=["test", "production"],
         default="test",
-        help="Operation mode: 'test' uses Gemini 2.5 Flash (free), 'production' uses GPT-4o (default: test)"
+        help="Operation mode: both 'test' and 'production' use Qwen 2.5 32B (local, free) by default (default: test)"
     )
 
     args = parser.parse_args()
 
     # Override model based on mode if not explicitly set
     if args.mode == "test":
-        model_to_use = "gemini-2.5-flash"
+        model_to_use = "qwen-32b"
     else:  # production
-        model_to_use = "gpt-4o"
+        model_to_use = "qwen-32b"
 
     # If user explicitly specified --model, that takes precedence
-    if args.model != "claude-3-5-sonnet":  # Not the default
+    if args.model != "qwen-32b":  # Not the default
         model_to_use = args.model
 
     try:

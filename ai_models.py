@@ -1,13 +1,18 @@
 """
 AI Model integration for multiple providers
-Supports: Anthropic Claude, OpenAI GPT, Google Gemini
+Supports: Qwen (via Ollama), Anthropic Claude, OpenAI GPT, Google Gemini
 """
 
 import os
+import sys
 from typing import Optional
-from anthropic import Anthropic
-import openai
-import google.generativeai as genai
+from pathlib import Path
+
+# Add UnifiedLLMClient to path
+unified_llm_path = Path.home() / 'Development' / 'Scripts' / 'UnifiedLLMClient'
+sys.path.insert(0, str(unified_llm_path))
+
+from llm_client import get_client
 
 
 class AIModelManager:
@@ -15,25 +20,31 @@ class AIModelManager:
 
     # Available models
     MODELS = {
+        # Qwen models (via Ollama - local, free)
+        'qwen-32b': {'provider': 'qwen', 'model': 'qwen2.5:32b', 'name': 'Qwen 2.5 32B (Local, Free, Default)'},
+        'qwen-72b': {'provider': 'qwen', 'model': 'qwen2.5:72b', 'name': 'Qwen 2.5 72B (Local, Free, Most Capable)'},
+        'qwen-14b': {'provider': 'qwen', 'model': 'qwen2.5:14b', 'name': 'Qwen 2.5 14B (Local, Free)'},
+        'qwen-7b': {'provider': 'qwen', 'model': 'qwen2.5:7b', 'name': 'Qwen 2.5 7B (Local, Free, Fastest)'},
+
         # Anthropic Claude models
-        'claude-3-5-sonnet': {'provider': 'anthropic', 'model': 'claude-sonnet-4-20250514', 'name': 'Claude 3.5 Sonnet (Latest)'},
-        'claude-3-5-haiku': {'provider': 'anthropic', 'model': 'claude-3-5-haiku-20241022', 'name': 'Claude 3.5 Haiku (Fast)'},
-        'claude-3-opus': {'provider': 'anthropic', 'model': 'claude-3-opus-20240229', 'name': 'Claude 3 Opus (Most Capable)'},
+        'claude-3-5-sonnet': {'provider': 'claude', 'model': 'claude-3-5-sonnet-20241022', 'name': 'Claude 3.5 Sonnet'},
+        'claude-3-5-haiku': {'provider': 'claude', 'model': 'claude-3-5-haiku-20241022', 'name': 'Claude 3.5 Haiku (Fast)'},
+        'claude-3-opus': {'provider': 'claude', 'model': 'claude-3-opus-20240229', 'name': 'Claude 3 Opus (Most Capable)'},
 
         # OpenAI GPT models
-        'gpt-4': {'provider': 'openai', 'model': 'gpt-4-turbo-preview', 'name': 'GPT-4 Turbo (Most Capable)'},
+        'gpt-4': {'provider': 'openai', 'model': 'gpt-4-turbo-preview', 'name': 'GPT-4 Turbo'},
         'gpt-4o': {'provider': 'openai', 'model': 'gpt-4o', 'name': 'GPT-4o (Multimodal)'},
-        'gpt-3.5-turbo': {'provider': 'openai', 'model': 'gpt-3.5-turbo', 'name': 'GPT-3.5 Turbo (Fast & Efficient)'},
+        'gpt-3.5-turbo': {'provider': 'openai', 'model': 'gpt-3.5-turbo', 'name': 'GPT-3.5 Turbo (Fast)'},
 
         # Google Gemini models
         'gemini-pro': {'provider': 'gemini', 'model': 'gemini-pro', 'name': 'Gemini Pro'},
-        'gemini-2.5-flash': {'provider': 'gemini', 'model': 'gemini-2.5-flash', 'name': 'Gemini 2.5 Flash (Latest, Fast & Free)'},
-        'gemini-2.5-pro': {'provider': 'gemini', 'model': 'gemini-2.5-pro', 'name': 'Gemini 2.5 Pro (Latest)'},
+        'gemini-2.5-flash': {'provider': 'gemini', 'model': 'gemini-2.5-flash', 'name': 'Gemini 2.5 Flash (Fast)'},
+        'gemini-2.5-pro': {'provider': 'gemini', 'model': 'gemini-2.5-pro', 'name': 'Gemini 2.5 Pro'},
         'gemini-1.5-pro': {'provider': 'gemini', 'model': 'gemini-1.5-pro-latest', 'name': 'Gemini 1.5 Pro'},
         'gemini-1.5-flash': {'provider': 'gemini', 'model': 'gemini-1.5-flash-latest', 'name': 'Gemini 1.5 Flash'},
     }
 
-    def __init__(self, model_key: str = 'claude-3-5-sonnet'):
+    def __init__(self, model_key: str = 'qwen-32b'):
         """Initialize AI Model Manager"""
         self.model_key = model_key
         self.model_info = self.MODELS.get(model_key)
@@ -45,74 +56,26 @@ class AIModelManager:
         self.model = self.model_info['model']
         self.name = self.model_info['name']
 
-        # Initialize appropriate client
+        # Initialize UnifiedLLMClient
         self._init_client()
 
     def _init_client(self):
-        """Initialize the appropriate AI client based on provider"""
-        if self.provider == 'anthropic':
-            api_key = os.getenv('ANTHROPIC_API_KEY')
-            if not api_key:
-                raise ValueError(
-                    "ANTHROPIC_API_KEY not found. Please set it in your .env file.\n"
-                    "Get your API key from https://console.anthropic.com/"
-                )
-            self.client = Anthropic(api_key=api_key)
-
-        elif self.provider == 'openai':
-            api_key = os.getenv('OPENAI_API_KEY')
-            if not api_key:
-                raise ValueError(
-                    "OPENAI_API_KEY not found. Please set it in your .env file.\n"
-                    "Get your API key from https://platform.openai.com/api-keys"
-                )
-            openai.api_key = api_key
-            self.client = openai
-
-        elif self.provider == 'gemini':
-            api_key = os.getenv('GOOGLE_API_KEY')
-            if not api_key:
-                raise ValueError(
-                    "GOOGLE_API_KEY not found. Please set it in your .env file.\n"
-                    "Get your API key from https://makersuite.google.com/app/apikey"
-                )
-            genai.configure(api_key=api_key)
-            self.client = genai.GenerativeModel(self.model)
+        """Initialize UnifiedLLMClient with the appropriate provider"""
+        try:
+            self.client = get_client(provider=self.provider)
+        except Exception as e:
+            raise ValueError(f"Failed to initialize {self.provider} client: {str(e)}")
 
     def generate(self, prompt: str, max_tokens: int = 16000) -> str:
-        """Generate content using the selected model"""
+        """Generate content using UnifiedLLMClient"""
         try:
-            if self.provider == 'anthropic':
-                return self._generate_anthropic(prompt, max_tokens)
-            elif self.provider == 'openai':
-                return self._generate_openai(prompt, max_tokens)
-            elif self.provider == 'gemini':
-                return self._generate_gemini(prompt)
+            return self.client.generate(
+                prompt=prompt,
+                max_tokens=max_tokens,
+                temperature=0.7
+            )
         except Exception as e:
             raise Exception(f"Error generating with {self.name}: {str(e)}")
-
-    def _generate_anthropic(self, prompt: str, max_tokens: int) -> str:
-        """Generate using Anthropic Claude"""
-        message = self.client.messages.create(
-            model=self.model,
-            max_tokens=max_tokens,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        return message.content[0].text
-
-    def _generate_openai(self, prompt: str, max_tokens: int) -> str:
-        """Generate using OpenAI GPT"""
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=max_tokens
-        )
-        return response.choices[0].message.content
-
-    def _generate_gemini(self, prompt: str) -> str:
-        """Generate using Google Gemini"""
-        response = self.client.generate_content(prompt)
-        return response.text
 
     @classmethod
     def get_available_models(cls) -> dict:
@@ -140,10 +103,11 @@ class AIModelManager:
         models = []
         by_provider = cls.list_models_by_provider()
 
-        for provider in ['anthropic', 'openai', 'gemini']:
+        for provider in ['qwen', 'claude', 'openai', 'gemini']:
             if provider in by_provider:
                 provider_name = {
-                    'anthropic': 'Anthropic Claude',
+                    'qwen': 'Qwen (Local, Free)',
+                    'claude': 'Anthropic Claude',
                     'openai': 'OpenAI GPT',
                     'gemini': 'Google Gemini'
                 }[provider]
